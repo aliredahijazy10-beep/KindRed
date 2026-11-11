@@ -33,6 +33,7 @@ model Donor {
   last_donation_date DateTime?
   user_id            Int        @unique
   user               User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  responded_requests Response[]
 
   @@index([blood_type, city])
   @@map("donors")
@@ -64,10 +65,26 @@ model Requests {
   status             RequestStatus @default(open)
   admin_id           Int
   admin              Admin         @relation(fields: [admin_id], references: [id], onDelete: Cascade)
+  responded_requests Response[]
 
   @@index([blood_type, city, status])
   @@index([admin_id])
   @@map("blood_requests")
+}
+
+model Response {
+  id           Int            @id @default(autoincrement())
+  donor_id     Int
+  request_id   Int
+  responded_at DateTime       @default(now())
+  updated_at   DateTime       @updatedAt
+  status       ResponseStatus @default(pending)
+  donor        Donor          @relation(fields: [donor_id], references: [id], onDelete: Cascade)
+  requests     Requests       @relation(fields: [request_id], references: [id], onDelete: Cascade)
+
+  @@unique([request_id, donor_id])
+  @@index([request_id, status])
+  @@map("responded_requests")
 }
 
 enum Role {
@@ -102,4 +119,12 @@ enum RequestStatus {
   fulfilled
   cancelled
   expired
+}
+
+enum ResponseStatus {
+  pending
+  accepted
+  rejected
+  donated
+  cancelled
 }
