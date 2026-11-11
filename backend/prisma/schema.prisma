@@ -17,6 +17,7 @@ model User {
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
   donor         Donor?
+  admin         Admin?
 
   @@map("users")
 }
@@ -35,6 +36,18 @@ model Donor {
 
   @@index([blood_type, city])
   @@map("donors")
+}
+
+model Admin {
+  id           Int        @id @default(autoincrement())
+  work_email   String     @unique
+  organization String
+  position     String
+  work_city    String
+  user_id      Int        @unique
+  user         User       @relation(fields: [user_id], references: [id], onDelete: Restrict)
+
+  @@map("admins")
 }
 
 enum Role {
