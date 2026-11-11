@@ -46,7 +46,7 @@ model Admin {
   position     String
   work_city    String
   user_id      Int        @unique
-  user         User       @relation(fields: [user_id], references: [id], onDelete: Restrict)
+  user         User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
   requests     Requests[]
   @@map("admins")
 }
@@ -64,7 +64,7 @@ model Requests {
   urgency            Urgency       @default(standard)
   status             RequestStatus @default(open)
   admin_id           Int
-  admin              Admin         @relation(fields: [admin_id], references: [id], onDelete: Cascade)
+  admin              Admin         @relation(fields: [admin_id], references: [id], onDelete: Restrict)
   responded_requests Response[]
 
   @@index([blood_type, city, status])
@@ -80,7 +80,7 @@ model Response {
   updated_at   DateTime       @updatedAt
   status       ResponseStatus @default(pending)
   donor        Donor          @relation(fields: [donor_id], references: [id], onDelete: Cascade)
-  requests     Requests       @relation(fields: [request_id], references: [id], onDelete: Cascade)
+  request     Requests       @relation(fields: [request_id], references: [id], onDelete: Cascade)
 
   @@unique([request_id, donor_id])
   @@index([request_id, status])
@@ -100,7 +100,7 @@ enum BloodType {
   AB_P @map("AB+")
   AB_N @map("AB-")
   O_P  @map("O+")
-  O_N  @map("0-")
+  O_N  @map("O-")
 }
 
 enum Gender {
