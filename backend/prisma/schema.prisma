@@ -16,11 +16,44 @@ model User {
   role          Role
   created_at    DateTime @default(now())
   updated_at    DateTime @updatedAt
+  donor         Donor?
 
   @@map("users")
+}
+
+model Donor {
+  id                 Int        @id @default(autoincrement())
+  blood_type         BloodType
+  city               String
+  birth_date         DateTime   @db.Date
+  gender             Gender
+  weight_kg          Float
+  medical_notes      String?
+  last_donation_date DateTime?
+  user_id            Int        @unique
+  user               User       @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([blood_type, city])
+  @@map("donors")
 }
 
 enum Role {
   user
   admin
+}
+
+enum BloodType {
+  A_P  @map("A+")
+  A_N  @map("A-")
+  B_P  @map("B+")
+  B_N  @map("B-")
+  AB_P @map("AB+")
+  AB_N @map("AB-")
+  O_P  @map("O+")
+  O_N  @map("0-")
+}
+
+enum Gender {
+  male
+  female
 }
