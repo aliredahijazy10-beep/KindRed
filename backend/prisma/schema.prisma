@@ -46,8 +46,28 @@ model Admin {
   work_city    String
   user_id      Int        @unique
   user         User       @relation(fields: [user_id], references: [id], onDelete: Restrict)
-
+  requests     Requests[]
   @@map("admins")
+}
+
+model Requests {
+  id                 Int           @id @default(autoincrement())
+  patient_name       String
+  blood_type         BloodType
+  city               String
+  hospital_name      String
+  units_needed       Int           @default(1)
+  created_at         DateTime      @default(now())
+  updated_at         DateTime      @updatedAt
+  needed_by_date     DateTime
+  urgency            Urgency       @default(standard)
+  status             RequestStatus @default(open)
+  admin_id           Int
+  admin              Admin         @relation(fields: [admin_id], references: [id], onDelete: Cascade)
+
+  @@index([blood_type, city, status])
+  @@index([admin_id])
+  @@map("blood_requests")
 }
 
 enum Role {
@@ -69,4 +89,17 @@ enum BloodType {
 enum Gender {
   male
   female
+}
+
+enum Urgency {
+  critical
+  high
+  standard
+}
+
+enum RequestStatus {
+  open
+  fulfilled
+  cancelled
+  expired
 }
